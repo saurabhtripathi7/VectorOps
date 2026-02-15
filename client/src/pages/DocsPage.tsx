@@ -49,7 +49,7 @@ const sections = [
     title: "Quick Setup",
     icon: <Settings className="w-5 h-5" />,
     content:
-      "To get started, configure your .env file with MONGODB_URI, GOOGLE_GENERATIVE_API_KEY, and CHROMA_URL. Then run npm install followed by npm run dev.",
+      "Configure server/.env with MongoDB, ChromaDB, Jina, Gemini, and OpenAI fallback keys, then run npm install and npm run dev.",
     color: "#ec4899",
   },
   {
@@ -57,15 +57,15 @@ const sections = [
     title: "Architecture",
     icon: <Workflow className="w-5 h-5" />,
     content:
-      "Data flows from the 'knowledge/' directory through a chunking and embedding pipeline into ChromaDB. During chat, relevant context is retrieved and passed to Gemini AI.",
+      "Uploaded documents are chunked, embedded with Jina, and stored in ChromaDB. Chat uses hybrid retrieval and Gemini generation with automatic OpenAI fallback.",
     color: "#22c55e",
   },
   {
-    id: "github-actions",
-    title: "Automated Ingestion",
+    id: "ingestion-workflow",
+    title: "Ingestion Workflow",
     icon: <Rocket className="w-5 h-5" />,
     content:
-      "GitHub Actions automatically detects new documents in your knowledge base and triggers the ingestion pipeline, keeping your embeddings in sync with your latest content.",
+      "Knowledge files can be ingested from the UI or via API endpoints. The server chunks content, generates embeddings, and updates ChromaDB metadata.",
     color: "#facc15",
   },
 ];
@@ -185,17 +185,17 @@ export default function DocsPage() {
                 <div className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5">
                   <FileText className="w-6 h-6 text-blue-400 mb-4" />
                   <h4 className="text-zinc-100 font-semibold mb-2">Multi-Format</h4>
-                  <p className="text-sm">Support for Markdown files out of the box.</p>
+                  <p className="text-sm">Supports PDF, DOCX, MD, and TXT ingestion pipelines.</p>
                 </div>
                 <div className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5">
                   <Cpu className="w-6 h-6 text-purple-400 mb-4" />
                   <h4 className="text-zinc-100 font-semibold mb-2">AI-Core</h4>
-                  <p className="text-sm">Driven by Gemini 2.5 flash for deep reasoning and synthesis.</p>
+                  <p className="text-sm">Gemini 2.5-flash primary generation with OpenAI failover.</p>
                 </div>
                 <div className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5">
                   <Database className="w-6 h-6 text-pink-400 mb-4" />
                   <h4 className="text-zinc-100 font-semibold mb-2">Vector Store</h4>
-                  <p className="text-sm">ChromaDB ensures lightning fast retrieval of relevant context.</p>
+                  <p className="text-sm">ChromaDB semantic retrieval fused with MiniSearch lexical ranking.</p>
                 </div>
               </div>
             </div>
@@ -220,15 +220,16 @@ export default function DocsPage() {
                   </div>
                 </div>
                 <div className="p-6 font-mono text-sm space-y-4">
-                  <p className="text-zinc-500"># Step 1: Star and Fork the Repository</p>
+                  <p className="text-zinc-500"># Step 1: Clone repository</p>
                   <div className="w-full overflow-hidden rounded-lg border border-white/10 bg-black/50">
                     <img src="/gitRepo.png" alt="Repo Link" className="w-full h-auto object-cover" />
                   </div>
                   <p className="text-zinc-500"># Step 2: Clone and install</p>
                   <p className="text-blue-400">git clone https://github.com/saurabhtripathi7/VectorOps.git</p>
-                  <p className="text-blue-400">cd vectorops && npm install</p>
+                  <p className="text-blue-400">cd VectorOps &amp;&amp; npm install</p>
                   <p className="text-zinc-500 mt-4"># Step 3: Configure environment</p>
-                  <p className="text-pink-400">cp .env.example .env</p>
+                  <p className="text-pink-400">cp server/.env.example server/.env</p>
+                  <p className="text-pink-400">cp client/.env.example client/.env # optional</p>
                   <p className="text-zinc-500 mt-4"># Step 4: Start development</p>
                   <p className="text-green-400">npm run dev</p>
                 </div>
@@ -240,15 +241,23 @@ export default function DocsPage() {
                   <ul className="space-y-3 text-sm text-zinc-400">
                     <li className="flex gap-2">
                       <div className="mt-1.5 w-1 h-1 rounded-full bg-zinc-600 shrink-0" />
-                      <span><code className="text-zinc-200">MONGODB_URI</code>: Your connection string for persistent chat history.</span>
+                      <span><code className="text-zinc-200">MONGODB_URI</code>: MongoDB connection string for sessions and messages.</span>
                     </li>
                     <li className="flex gap-2">
                       <div className="mt-1.5 w-1 h-1 rounded-full bg-zinc-600 shrink-0" />
-                      <span><code className="text-zinc-200">GOOGLE_GENERATIVE_API_KEY</code>: Used for both embeddings and response generation.</span>
+                      <span><code className="text-zinc-200">GOOGLE_GENERATIVE_AI_API_KEY</code>: Gemini key for primary generation.</span>
                     </li>
                     <li className="flex gap-2">
                       <div className="mt-1.5 w-1 h-1 rounded-full bg-zinc-600 shrink-0" />
-                      <span><code className="text-zinc-200">CHROMA_URL</code>: The URL of your ChromaDB instance (local or hosted).</span>
+                      <span><code className="text-zinc-200">JINA_API_KEY</code>: Embedding API key for vector generation.</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <div className="mt-1.5 w-1 h-1 rounded-full bg-zinc-600 shrink-0" />
+                      <span><code className="text-zinc-200">CHROMA_API_KEY / CHROMA_TENANT / CHROMA_DATABASE</code>: ChromaDB Cloud credentials.</span>
+                    </li>
+                    <li className="flex gap-2">
+                      <div className="mt-1.5 w-1 h-1 rounded-full bg-zinc-600 shrink-0" />
+                      <span><code className="text-zinc-200">OPENAI_API_KEY</code>: Used for fallback when Gemini fails or is rate-limited.</span>
                     </li>
                   </ul>
                 </div>
@@ -268,21 +277,21 @@ export default function DocsPage() {
                     <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold shrink-0">1</div>
                     <div>
                       <h5 className="text-zinc-100 font-semibold mb-1">Data Ingestion</h5>
-                      <p className="text-sm text-zinc-400">Documents in <code className="text-zinc-300">knowledge/</code> are loaded and split into semantic chunks.</p>
+                      <p className="text-sm text-zinc-400">Documents are uploaded via UI or <code className="text-zinc-300">/api/injest</code>, then split into chunks.</p>
                     </div>
                   </div>
                   <div className="flex gap-4">
                     <div className="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold shrink-0">2</div>
                     <div>
                       <h5 className="text-zinc-100 font-semibold mb-1">Vectorization</h5>
-                      <p className="text-sm text-zinc-400">Gemini generates high-dimensional embeddings for each chunk, stored in ChromaDB.</p>
+                      <p className="text-sm text-zinc-400">Jina generates embeddings for each chunk, which are stored in ChromaDB with metadata.</p>
                     </div>
                   </div>
                   <div className="flex gap-4">
                     <div className="w-8 h-8 rounded-full bg-green-500/20 text-green-400 flex items-center justify-center font-bold shrink-0">3</div>
                     <div>
                       <h5 className="text-zinc-100 font-semibold mb-1">Retrieval & Chat</h5>
-                      <p className="text-sm text-zinc-400">Natural language queries trigger a similarity search, fetching context for the LLM.</p>
+                      <p className="text-sm text-zinc-400">Hybrid retrieval (semantic + lexical) builds context for Gemini, with automatic OpenAI fallback on failure.</p>
                     </div>
                   </div>
                 </div>
@@ -297,60 +306,76 @@ export default function DocsPage() {
             </div>
           </section>
 
-          <section id="github-actions" className="scroll-mt-32">
+          <section id="ingestion-workflow" className="scroll-mt-32">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-1.5 h-8 bg-yellow-500 rounded-full" />
-              <h2 className="text-3xl font-bold text-white">Automated Knowledge Ingestion</h2>
+              <h2 className="text-3xl font-bold text-white">Ingestion Workflow</h2>
             </div>
             <div className="space-y-6">
               <p className="text-zinc-400 leading-relaxed">
-                VectorOps uses GitHub Actions to automatically ingest and index any new documents you add to the <code className="text-zinc-300">knowledge/</code> directory. When you push changes to your repository, the workflow detects modified files and sends them to the ingestion pipeline.
+                VectorOps supports ingestion through both UI uploads and direct API calls. Each file is parsed, chunked, embedded, and written into ChromaDB so it becomes available for retrieval in chat.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5">
                   <h4 className="text-zinc-100 font-semibold mb-3 flex items-center gap-2">
-                    <span className="text-yellow-400">Tooling</span>
+                    <span className="text-yellow-400">Pipeline</span>
                     How It Works
                   </h4>
                   <ul className="space-y-2 text-sm text-zinc-400">
-                    <li>• Detects changes in <code className="text-zinc-300">knowledge/**</code> directory</li>
-                    <li>• Identifies all modified files automatically</li>
-                    <li>• Sends files to the ingestion API endpoint</li>
-                    <li>• Files are chunked and embedded into ChromaDB</li>
-                    <li>• Instantly available for semantic search</li>
+                    <li>- Accepts <code className="text-zinc-300">.md</code>, <code className="text-zinc-300">.txt</code>, <code className="text-zinc-300">.pdf</code>, <code className="text-zinc-300">.docx</code></li>
+                    <li>- Splits text into overlapping chunks for retrieval quality</li>
+                    <li>- Generates vectors with Jina embeddings</li>
+                    <li>- Stores chunks + metadata in ChromaDB</li>
+                    <li>- Index is immediately available to chat retrieval</li>
                   </ul>
                 </div>
                 <div className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5">
                   <h4 className="text-zinc-100 font-semibold mb-3 flex items-center gap-2">
-                    <span className="text-blue-400">Setup</span>
-                    Setup Required
+                    <span className="text-blue-400">API</span>
+                    Quick Test
                   </h4>
                   <ul className="space-y-2 text-sm text-zinc-400">
-                    <li>• Add your API key to GitHub Secrets as <code className="text-zinc-300">INGEST_API_KEY</code></li>
-                    <li>• Update the <code className="text-zinc-300">INGEST_API_URL</code> in workflow</li>
-                    <li>• Ensure your ingestion server is running</li>
-                    <li>• Commit changes to <code className="text-zinc-300">knowledge/</code> to trigger</li>
-                    <li>• Monitor Actions tab for execution logs</li>
+                    <li>- Start the server with <code className="text-zinc-300">npm run dev</code></li>
+                    <li>- POST to <code className="text-zinc-300">/api/injest</code> or <code className="text-zinc-300">/api/ingest</code></li>
+                    <li>- Provide <code className="text-zinc-300">filePath</code> and file content/base64 payload</li>
+                    <li>- Verify ingestion by calling <code className="text-zinc-300">/api/knowledge</code></li>
+                    <li>- Ask questions in chat to validate retrieval grounding</li>
                   </ul>
                 </div>
               </div>
               <div className="bg-zinc-900/80 rounded-2xl border border-white/5 overflow-hidden">
                 <div className="px-6 py-4 border-b border-white/5">
-                  <span className="text-xs font-mono text-zinc-500">Workflow Example: convertToEmbeddings.yml</span>
+                  <span className="text-xs font-mono text-zinc-500">Example: Ingest via API</span>
                 </div>
                 <div className="p-6 font-mono text-xs space-y-3 text-zinc-300 overflow-x-auto">
-                  <p><span className="text-pink-400">name:</span> Ingest Knowledge Base</p>
-                  <p><span className="text-pink-400">on:</span></p>
-                  <p className="ml-2"><span className="text-pink-400">push:</span></p>
-                  <p className="ml-4"><span className="text-pink-400">paths:</span></p>
-                  <p className="ml-6">- <span className="text-green-400">&quot;knowledge/**&quot;</span></p>
-                  <p><span className="text-pink-400">jobs:</span></p>
-                  <p className="ml-2"><span className="text-pink-400">ingest:</span></p>
-                  <p className="ml-4"><span className="text-pink-400">runs-on:</span> ubuntu-latest</p>
-                  <p className="ml-4"><span className="text-pink-400">steps:</span></p>
-                  <p className="ml-6">- <span className="text-pink-400">name:</span> Ingest changed files</p>
-                  <p className="ml-8 text-blue-400">curl -X POST to API with file content</p>
+                  <p className="text-blue-400">curl -X POST http://localhost:4000/api/injest \</p>
+                  <p className="text-blue-400">  -H &quot;Content-Type: application/json&quot; \</p>
+                  <p className="text-blue-400">  -d &#123;</p>
+                  <p className="ml-4 text-blue-400">&quot;filePath&quot;: &quot;knowledge/example.md&quot;,</p>
+                  <p className="ml-4 text-blue-400">&quot;content&quot;: &quot;# Sample\\nVectorOps ingestion test.&quot;</p>
+                  <p className="text-blue-400">  &#125;</p>
                 </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="concepts" className="scroll-mt-32">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-1.5 h-8 bg-purple-500 rounded-full" />
+              <h2 className="text-3xl font-bold text-white">Core Concepts</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5">
+                <h4 className="text-zinc-100 font-semibold mb-2">Hybrid Retrieval</h4>
+                <p className="text-sm text-zinc-400">Combines semantic search from ChromaDB with lexical ranking from MiniSearch for stronger relevance.</p>
+              </div>
+              <div className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5">
+                <h4 className="text-zinc-100 font-semibold mb-2">Model Reliability</h4>
+                <p className="text-sm text-zinc-400">Gemini handles primary generation while OpenAI fallback recovers from failures, empty outputs, and rate limits.</p>
+              </div>
+              <div className="p-6 rounded-2xl bg-zinc-900/50 border border-white/5">
+                <h4 className="text-zinc-100 font-semibold mb-2">Grounded Answers</h4>
+                <p className="text-sm text-zinc-400">Responses are built from retrieved chunks and include citations so users can trace output back to sources.</p>
               </div>
             </div>
           </section>
@@ -384,7 +409,7 @@ export default function DocsPage() {
             <span className="font-semibold text-zinc-100">VectorOps</span>
           </div>
           <p className="text-sm text-zinc-500">
-            &copy; 2025 VectorOps. Built with care for the community by <a href="https://linkedin.com/in/saurabhtripathicr7" target="_blank" rel="noreferrer" className="text-blue-400 hover:underline">Saurabh Tripathi</a>.
+            &copy; {new Date().getFullYear()} VectorOps. Built with care for the community by <a href="https://linkedin.com/in/saurabhtripathicr7" target="_blank" rel="noreferrer" className="text-blue-400 hover:underline">Saurabh Tripathi</a>.
           </p>
         </div>
       </footer>
