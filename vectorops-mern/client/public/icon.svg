@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="VectorOps logo">
+  <defs>
+    <linearGradient id="voGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4F46E5" />
+      <stop offset="100%" stop-color="#7C3AED" />
+    </linearGradient>
+  </defs>
+  <rect x="24" y="24" width="464" height="464" rx="112" fill="url(#voGradient)" />
+  <path
+    d="M120 120 L256 404 L392 120 H330 L256 322 L182 120 Z"
+    fill="#FFFFFF"
+  />
+</svg>

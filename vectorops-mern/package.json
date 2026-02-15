@@ -1,0 +1,18 @@
+{
+  "name": "vectorops-mern",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm:dev --workspace client\" \"npm:dev --workspace server\"",
+    "build": "npm run build --workspace client && npm run build --workspace server",
+    "start": "npm run start --workspace server",
+    "lint": "npm run lint --workspace client && npm run lint --workspace server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
