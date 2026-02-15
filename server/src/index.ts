@@ -9,13 +9,17 @@ import ingestRouter from "./routes/injest";
 
 const app = express();
 
-const corsOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(",").map((origin) => origin.trim())
-  : ["http://localhost:5173"];
+const corsOrigins = [process.env.CORS_ORIGIN, process.env.CORS_ORIGIN_ALT]
+  .filter(Boolean)
+  .flatMap((value) => (value as string).split(","))
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const allowedOrigins = corsOrigins.length > 0 ? corsOrigins : ["http://localhost:5173"];
 
 app.use(
   cors({
-    origin: corsOrigins,
+    origin: allowedOrigins,
     credentials: true,
   })
 );
